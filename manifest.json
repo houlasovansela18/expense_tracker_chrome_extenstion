@@ -1,0 +1,24 @@
+{
+    "name": "Expense Tracker",
+    "version": "1.0.0",
+    "description": "Help people track their asset.",
+    "permissions": [
+        "activeTab",
+        "<all_urls>",
+        "tabs"
+    ],
+    "background": {
+        "page": "./background.html",
+        "persistent": false
+    },
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "icons":{
+        "16":"icon16.png",
+        "48":"icon48.png",
+        "128":"icon128.png"
+    },
+    "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://cdn.firebase.com https://apis.google.com https://ajax.googleapis.com/ https://cdn.jsdelivr.net/; object-src 'self'"
+}
