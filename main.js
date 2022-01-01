@@ -1,11 +1,11 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyD87VxswmmW2yqUwH1NndVNfpyQp1mXQ1A",
-    authuser_id: "mydatabase0801.firebaseapp.com",
-    databaseURL: "https://mydatabase0801.firebaseio.com",
-    projectId: "mydatabase0801",
-    storageBucket: "mydatabase0801.appspot.com",
-    messagingSenderId: "774056850128",
-    appId: "1:774056850128:web:b3caf6b51eea104fe464d5"
+    apiKey: "",
+    authuser_id: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
 };
 
 firebase.initializeApp(firebaseConfig);
