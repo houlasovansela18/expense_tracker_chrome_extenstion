@@ -104,10 +104,10 @@ var parseUserData = function(user_credential_data){
                     snapshot_length+=1
                     var history = childSnapshot.val();
                     var text_color = "text-light"
-                    var li_class = "border-start rounded-start border-success border-5"
+                    var li_class = "border-start rounded-start border-success border-3"
                     var amount = parseFloat(history.amount)
                     if(history.type === "expense"){
-                        li_class = "border-start rounded-start border-danger border-5"
+                        li_class = "border-start rounded-start border-danger border-3"
                         text_color = "text-danger"
                         total_expense += amount
                         amount = (-1) * amount
