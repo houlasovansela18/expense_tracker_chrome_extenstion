@@ -7,24 +7,25 @@ var user_data = {
     picture: ""
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, response) {
     if (request.message === 'is_user_signed_in') {
-        sendResponse({
+        response({
             status: 'success',
             payload: user_signed_in
         });
     } else if (request.message === 'sign_out') {
-        user_signed_in = false
+        user_signed_in = false;
         user_data = {
             id: "",
             email: "",
             given_name: "",
             picture: ""
-        }
-        sendResponse({ status: 'success' });
+        };
+        response({ status: 'success' });
+        
     } else if (request.message === 'sign_in') {
         user_signed_in = true
-        sendResponse({ status: 'success' });
+        response({ status: 'success' });
     }
 
     return true;

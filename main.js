@@ -1,11 +1,11 @@
 const firebaseConfig = {
-    apiKey: "",
-    authuser_id: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyD87VxswmmW2yqUwH1NndVNfpyQp1mXQ1A",
+    authDomain: "mydatabase0801.firebaseapp.com",
+    databaseURL: "https://mydatabase0801.firebaseio.com",
+    projectId: "mydatabase0801",
+    storageBucket: "mydatabase0801.appspot.com",
+    messagingSenderId: "774056850128",
+    appId: "1:774056850128:web:b3caf6b51eea104fe464d5"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -16,26 +16,69 @@ chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
         user_info = response.data
         parseUserData(response.data);
     }else{
-        chrome.runtime.sendMessage({ message: 'sign_out' },function (response) {
-            if (response.status === 'success') {
-                window.location.replace('./popleft.html');
-            }
+        chrome.runtime.sendMessage({ message: 'sign_out' },() => {
+            window.location.replace('./popup.html');
         })
     }
 });
 
-document.querySelector("#logout").addEventListener('click', () => {
-    chrome.runtime.sendMessage({ message: 'sign_out' },function (response) {
-            if (response.status === 'success') {
-                window.location.replace('./popup.html');
-            }
-    })
-})
+window.onclick = function(event) {
+    var target = event.target ;
+    if(target.matches('.remove_history')) {
+        firebase.database().ref('/user_info/'+ user_info.id +"/"+ target.id).remove()
+        parseUserData(user_info)
+    }
+}
 
-document.querySelector("#clear_all").addEventListener('click', () => {
-    firebase.database().ref('/user_info/'+ user_info.id).remove()
-    parseUserData(user_info)
-})
+$(document).ready(function() {
+
+    document.querySelector("#logout").addEventListener('click', () => {
+        chrome.runtime.sendMessage({ message: 'sign_out' },() => {
+            window.location.replace('./popup.html');
+        })
+    })
+    document.querySelector("#clear_all").addEventListener('click', () => {
+        firebase.database().ref('/user_info/'+ user_info.id).remove()
+        parseUserData(user_info)
+    })
+    document.querySelector("#income_button").addEventListener('click', () => {
+        if (validate_input()){
+            const d = new Date();
+            try {
+                firebase.database().ref('/user_info/'+ user_info.id).push().set({
+                    amount: document.getElementById('amount').value,
+                    date: d.toDateString(),
+                    description: document.getElementById('description').value,
+                    type: "income"
+                });
+            } catch (error) {
+                console.log("error:",e);
+            }
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            parseUserData(user_info)
+        }
+    })
+    
+    document.querySelector("#expense_button").addEventListener('click', () => {
+        if(validate_input()){
+            const d = new Date();
+            try {
+                firebase.database().ref('/user_info/'+ user_info.id).push().set({
+                    amount: document.getElementById('amount').value,
+                    date: d.toDateString(),
+                    description: document.getElementById('description').value,
+                    type: "expense"
+                });
+            } catch (error) {
+                console.log("error:",e);
+            }
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            parseUserData(user_info)
+        }
+    })
+});
 
 function validate_input(){
     if (document.getElementById("description").value != ''){
@@ -49,44 +92,6 @@ function validate_input(){
     }
 }
 
-document.querySelector("#income_button").addEventListener('click', () => {
-    if (validate_input()){
-        const d = new Date();
-        try {
-            firebase.database().ref('/user_info/'+ user_info.id).push().set({
-                amount: document.getElementById('amount').value,
-                date: d.toDateString(),
-                description: document.getElementById('description').value,
-                type: "income"
-            });
-        } catch (error) {
-            console.log("error:",e);
-        }
-        document.getElementById('amount').value = '';
-        document.getElementById('description').value = '';
-        parseUserData(user_info)
-    }
-})
-
-document.querySelector("#expense_button").addEventListener('click', () => {
-    if(validate_input()){
-        const d = new Date();
-        try {
-            firebase.database().ref('/user_info/'+ user_info.id).push().set({
-                amount: document.getElementById('amount').value,
-                date: d.toDateString(),
-                description: document.getElementById('description').value,
-                type: "expense"
-            });
-        } catch (error) {
-            console.log("error:",e);
-        }
-        document.getElementById('amount').value = '';
-        document.getElementById('description').value = '';
-        parseUserData(user_info)
-    }
-})
-
 var parseUserData = function(user_credential_data){
     try{
         firebase.database().ref('/user_info/'+ user_credential_data.id).orderByChild('date').once('value', (snapshot) =>{
@@ -99,20 +104,22 @@ var parseUserData = function(user_credential_data){
                     snapshot_length+=1
                     var history = childSnapshot.val();
                     var text_color = "text-light"
+                    var li_class = "border-start rounded-start border-success border-5"
                     var amount = parseFloat(history.amount)
                     if(history.type === "expense"){
+                        li_class = "border-start rounded-start border-danger border-5"
                         text_color = "text-danger"
                         total_expense += amount
                         amount = (-1) * amount
                     }else{
                         total_income += amount
                     }
-                    historyList+='<li class="list-groleft-item bg-transparent p-0" id="'+childSnapshot.key+'">'+
+                    historyList+='<li class="'+li_class+' ps-3 mb-1" id="'+childSnapshot.key+'">'+
                     '<div class="clearfix">'+
                     '<div class="float-start fs-5 '+text_color+'">'+history.description+'</div>'+
                     '<div class="float-end fs-5 '+text_color+'">'+
                     amount+
-                    ' $<span class="ms-3 fs-6 text-danger" type="button" id="'+childSnapshot.key+'">x</span>'+
+                    ' $<span class="ms-3 fs-6 text-danger remove_history" type="button" id="'+childSnapshot.key+'">x</span>'+
                     '</div>'+
                     '</div>'+
                     '<div class="text-secondary">'+

@@ -1,12 +1,12 @@
 
 const firebaseConfig = {
-    apiKey: "",
-    authuser_id: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyD87VxswmmW2yqUwH1NndVNfpyQp1mXQ1A",
+    authDomain: "mydatabase0801.firebaseapp.com",
+    databaseURL: "https://mydatabase0801.firebaseio.com",
+    projectId: "mydatabase0801",
+    storageBucket: "mydatabase0801.appspot.com",
+    messagingSenderId: "774056850128",
+    appId: "1:774056850128:web:b3caf6b51eea104fe464d5"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -25,9 +25,7 @@ const uiConfig = {
                     given_name: authResult.additionalUserInfo.profile.given_name,
                     picture: authResult.additionalUserInfo.profile.picture
                 }
-                chrome.runtime.sendMessage({command: "fetch", payload: user_data}, () => {
-                    console.log('success');
-                });
+                chrome.runtime.sendMessage({command: "fetch", payload: user_data}, () => {});
                 chrome.runtime.sendMessage({ message: 'sign_in'}, () => {
                     window.location.replace('./main.html');
                 });
