@@ -24,10 +24,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
         response({ status: 'success' });
         
     } else if (request.message === 'sign_in') {
-        user_signed_in = true
+        user_signed_in = true;
         response({ status: 'success' });
     }
-
+    console.log(user_signed_in);
     return true;
 });
 
