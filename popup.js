@@ -17,8 +17,7 @@ const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
 const uiConfig = {
     callbacks: {
-        signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-
+        signInSuccessWithAuthResult: (authResult) => {
                 const user_data = {
                     id: authResult.additionalUserInfo.profile.id,
                     email: authResult.additionalUserInfo.profile.email,

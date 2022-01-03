@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 var user_info = {}
 
 chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
-    if (response.data.given_name != ""){
+    if (response.data != undefined){
         user_info = response.data
         parseUserData(response.data);
     }else{
