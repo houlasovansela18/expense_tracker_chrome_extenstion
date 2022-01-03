@@ -14,7 +14,7 @@ var user_info = {}
 chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
     if (response.data != undefined){
         user_info = response.data
-        parseUserData(response.data);
+        parseUserData(user_info);
     }else{
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
             window.location.replace('./popup.html');
@@ -142,6 +142,7 @@ var parseUserData = function(user_credential_data){
                     document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button">clear all</span>'
                 }
             }else{
+                document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button"></span>'
                 document.getElementById("history_display").innerHTML = 'No user history'
             }
         });
