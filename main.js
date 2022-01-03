@@ -34,7 +34,7 @@ $(document).ready(function() {
 
     document.querySelector("#logout").addEventListener('click', () => {
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
-            window.location.replace('./popup.html');
+            window.location.replace('./signup.html');
         })
     })
     document.querySelector("#clear_all").addEventListener('click', () => {
