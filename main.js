@@ -12,8 +12,8 @@ firebase.initializeApp(firebaseConfig);
 var user_info = {}
 
 chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
-    if (response.data != undefined){
-        user_info = response.data
+    user_info = response.data
+    if (user_info.email != ""){
         parseUserData(user_info);
     }else{
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {

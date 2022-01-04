@@ -2,7 +2,6 @@
 chrome.runtime.onMessage.addListener(function (request, sender, response) {
     if (request.message === 'is_user_signed_in') {
         var user_signed_in = JSON.parse(localStorage.getItem('user_signed_in'))
-        console.log(user_signed_in);
         if (user_signed_in != undefined){
             response({
                 status: 'success',
@@ -13,14 +12,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
         }
     } else if (request.message === 'sign_out') {
         localStorage.setItem('user_signed_in', false);
-        user_data = {
-            id: "",
-            email: "",
-            given_name: "",
-            picture: ""
-        };
+        var user_data = {}
+        localStorage.setItem('user_data', JSON.stringify(user_data));
         response({ status: 'success' });
-        
+
     } else if (request.message === 'sign_in') {
         localStorage.setItem('user_signed_in', true);
         response({ status: 'success' });
