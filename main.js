@@ -14,7 +14,7 @@ var user_info = {}
 chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
     user_info = response.data
     if (user_info.email != ""){
-        parseUserData(user_info);
+        parseUserInfo(user_info)
     }else{
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
             window.location.replace('./popup.html');
@@ -24,9 +24,10 @@ chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
 
 window.onclick = function(event) {
     var target = event.target ;
+    const selected_wallet = $("#wallet_collections :selected").text();
     if(target.matches('.remove_history')) {
-        firebase.database().ref('/user_info/'+ user_info.id +"/"+ target.id).remove()
-        parseUserData(user_info)
+        firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/${target.id}`).remove()
+        parseUserData(selected_wallet)
     }
 }
 
@@ -38,14 +39,16 @@ $(document).ready(function() {
         })
     })
     document.querySelector("#clear_all").addEventListener('click', () => {
-        firebase.database().ref('/user_info/'+ user_info.id).remove()
+        const selected_wallet = $("#wallet_collections :selected").text();
+        firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).remove()
         parseUserData(user_info)
     })
     document.querySelector("#income_button").addEventListener('click', () => {
         if (validate_input()){
             const d = new Date();
+            const selected_wallet = $("#wallet_collections :selected").text();
             try {
-                firebase.database().ref('/user_info/'+ user_info.id).push().set({
+                firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
                     date: d.toDateString(),
                     description: document.getElementById('description').value,
@@ -59,12 +62,12 @@ $(document).ready(function() {
             parseUserData(user_info)
         }
     })
-    
     document.querySelector("#expense_button").addEventListener('click', () => {
         if(validate_input()){
             const d = new Date();
+            const selected_wallet = $("#wallet_collections :selected").text();
             try {
-                firebase.database().ref('/user_info/'+ user_info.id).push().set({
+                firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
                     date: d.toDateString(),
                     description: document.getElementById('description').value,
@@ -78,23 +81,62 @@ $(document).ready(function() {
             parseUserData(user_info)
         }
     })
+    document.querySelector("#wallet_button").addEventListener('click', () => {
+        if(validate_input_wallet()){
+            $("#wallet_collections").append(new Option(document.getElementById("wallet").value));
+        }
+        document.getElementById("wallet").value = '';
+    })
+    $("select").change(function(){
+        const selected_wallet = $("#wallet_collections :selected").text();
+        parseUserData(selected_wallet)
+    })
 });
 
 function validate_input(){
-    if (document.getElementById("description").value != ''){
+    if (document.getElementById("description").value.length >= 4){
         if(document.getElementById("amount").value != ''){
             return true
         }else{
             $("#amount_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
+            return false
         }
     }else{
         $("#description_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
+        return false
+    }
+    
+}
+
+function validate_input_wallet(){
+    if(document.getElementById("wallet").value.length >= 4 && document.getElementById("wallet").value.length <= 8){
+        return true
+    }else{
+        $("#wallet_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
+        return false
     }
 }
 
-var parseUserData = function(user_credential_data){
+var parseUserInfo = function(user_info){
+
+    document.getElementById("user_picture").src = user_info.picture;
+    document.getElementById("balance_label").innerHTML = user_info.given_name+"'s BALANCE"
+    firebase.database().ref(`/user_info/${user_info.id}/`).once('value', (snapshot) =>{
+        if (snapshot.val()){
+            var walletList = "";
+            snapshot.forEach((childSnapshot) => {
+                walletList += '<option>'+childSnapshot.key+'</option>'
+            });
+        }else{
+            document.getElementById("history_display").innerHTML = 'No user wallet'
+        }
+        document.getElementById("wallet_collections").innerHTML = walletList;
+    });
+}
+
+var parseUserData = function(selected_wallet){
     try{
-        firebase.database().ref('/user_info/'+ user_credential_data.id).orderByChild('date').once('value', (snapshot) =>{
+        firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).orderByChild('date').once('value', (snapshot) =>{
             if (snapshot.val()){
                 var historyList = ""
                 var total_income = 0
@@ -134,9 +176,9 @@ var parseUserData = function(user_credential_data){
                 balance = Math.abs(balance_differ)
                 document.getElementById("balance").innerHTML = balance;
                 if(balance_differ < 0){
-                    document.getElementById("balance_div").className = "pb-2 text-center display-2 fw-bold text-danger"
+                    document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-danger"
                 }else{
-                    document.getElementById("balance_div").className = "pb-2 text-center display-2 fw-bold text-light"
+                    document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-light"
                 }
                 if (snapshot_length > 0){
                     document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button">clear all</span>'
@@ -146,12 +188,7 @@ var parseUserData = function(user_credential_data){
                 document.getElementById("history_display").innerHTML = 'No user history'
             }
         });
-        document.getElementById("user_picture").src = user_credential_data.picture;
-        document.getElementById("balance_label").innerHTML = user_credential_data.given_name+"'s BALANCE"
     }catch(e){
         console.log("Something error while trying accessing firebase",e);
     }
 }
-
-
-
