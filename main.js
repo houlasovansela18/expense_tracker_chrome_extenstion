@@ -146,7 +146,7 @@ var parseUserInfo = function(user_info){
             document.getElementById("history_display").innerHTML = 'No user wallet'
         }
         document.getElementById("wallet_collections").innerHTML = walletList;
-    });
+    }); 
 }
 
 var parseUserData = function(selected_wallet){
