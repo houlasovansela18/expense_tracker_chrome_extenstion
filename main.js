@@ -41,12 +41,12 @@ $(document).ready(function() {
     document.querySelector("#clear_all").addEventListener('click', () => {
         const selected_wallet = $("#wallet_collections :selected").text();
         firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).remove()
-        parseUserData(user_info)
+        parseUserData(selected_wallet)
     })
     document.querySelector("#income_button").addEventListener('click', () => {
-        if (validate_input()){
-            const d = new Date();
-            const selected_wallet = $("#wallet_collections :selected").text();
+        const d = new Date();
+        const selected_wallet = $("#wallet_collections :selected").text();
+        if(validate_input() && selected_wallet != ''){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
@@ -59,13 +59,13 @@ $(document).ready(function() {
             }
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
-            parseUserData(user_info)
+            parseUserData(selected_wallet)
         }
     })
     document.querySelector("#expense_button").addEventListener('click', () => {
-        if(validate_input()){
-            const d = new Date();
-            const selected_wallet = $("#wallet_collections :selected").text();
+        const d = new Date();
+        const selected_wallet = $("#wallet_collections :selected").text();
+        if(validate_input() && selected_wallet != ''){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
@@ -78,7 +78,7 @@ $(document).ready(function() {
             }
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
-            parseUserData(user_info)
+            parseUserData(selected_wallet)
         }
     })
     document.querySelector("#wallet_button").addEventListener('click', () => {
