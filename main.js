@@ -31,6 +31,21 @@ window.onclick = function(event) {
     }
 }
 
+document.querySelector("#flexSwitchCheckChecked").addEventListener('click', () => {
+    if(document.getElementById("flexSwitchCheckChecked").checked){
+        var highlightedItems = document.querySelectorAll(".text-light");
+        console.log(highlightedItems);
+        highlightedItems.forEach(function(userItem) {
+            userItem.className.replace("text-light","text-black")
+        });
+    }else{
+        var highlightedItems = document.querySelectorAll(".text-black");
+        highlightedItems.forEach(function(userItem) {
+            userItem.className.replace("text-black","text-light")
+        });
+    }
+})
+
 $(document).ready(function() {
 
     document.querySelector("#logout").addEventListener('click', () => {
@@ -145,7 +160,7 @@ var parseUserData = function(selected_wallet){
                 snapshot.forEach((childSnapshot) => {
                     snapshot_length+=1
                     var history = childSnapshot.val();
-                    var text_color = "text-light"
+                    var text_color = "text-success"
                     var li_class = "border-start rounded-start border-success border-3"
                     var amount = parseFloat(history.amount)
                     if(history.type === "expense"){
@@ -178,7 +193,7 @@ var parseUserData = function(selected_wallet){
                 if(balance_differ < 0){
                     document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-danger"
                 }else{
-                    document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-light"
+                    document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-success"
                 }
                 if (snapshot_length > 0){
                     document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button">clear all</span>'
