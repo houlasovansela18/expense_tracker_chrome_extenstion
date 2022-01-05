@@ -48,7 +48,7 @@ document.querySelector("#flexSwitchCheckChecked").addEventListener('click', () =
 
 $(document).ready(function() {
 
-    document.querySelector("#logout").addEventListener('click', () => {
+    document.querySelector("#logout").addEventListener('dblclick', () => {
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
             window.location.replace('./signup.html');
         })
@@ -145,7 +145,7 @@ var parseUserInfo = function(user_info){
         }else{
             document.getElementById("history_display").innerHTML = 'No user wallet'
         }
-        document.getElementById("wallet_collections").innerHTML = walletList;
+        document.getElementById("wallet_collections").innerHTML = walletList
     }); 
 }
 
