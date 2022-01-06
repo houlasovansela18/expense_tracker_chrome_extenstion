@@ -31,22 +31,47 @@ window.onclick = function(event) {
     }
 }
 
+function turnOffLight(){
+    document.body.style.backgroundColor = "#fff"
+    const highlightedItems = document.querySelectorAll(".text_class");
+    highlightedItems.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("text-light","text-dark")
+    });
+    const highlightedItems_bg = document.querySelectorAll(".bg-dark");
+    highlightedItems_bg.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("bg-dark","bg-light")
+    });
+}
+
+function turnOnLight(){
+    document.body.style.backgroundColor = "rgb(20, 20, 20)"
+    const highlightedItems = document.querySelectorAll(".text_class");
+    highlightedItems.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("text-dark","text-light")
+    });
+    const highlightedItems_bg = document.querySelectorAll(".bg-light");
+    highlightedItems_bg.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("bg-light","bg-dark")
+    });
+}
+
 document.querySelector("#flexSwitchCheckChecked").addEventListener('click', () => {
     if(document.getElementById("flexSwitchCheckChecked").checked){
-        var highlightedItems = document.querySelectorAll(".text-light");
-        console.log(highlightedItems);
-        highlightedItems.forEach(function(userItem) {
-            userItem.className.replace("text-light","text-black")
-        });
+        turnOffLight()
+        localStorage.setItem("theme","dark")
     }else{
-        var highlightedItems = document.querySelectorAll(".text-black");
-        highlightedItems.forEach(function(userItem) {
-            userItem.className.replace("text-black","text-light")
-        });
+        turnOnLight()
+        localStorage.setItem("theme","light")
     }
 })
 
 $(document).ready(function() {
+
+    if(localStorage.getItem('theme') === "light"){
+        turnOnLight()
+    }else{
+        turnOffLight()
+    }
 
     document.querySelector("#logout").addEventListener('dblclick', () => {
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
@@ -138,7 +163,7 @@ var parseUserInfo = function(user_info){
     document.getElementById("balance_label").innerHTML = user_info.given_name+"'s BALANCE"
     firebase.database().ref(`/user_info/${user_info.id}/`).once('value', (snapshot) =>{
         if (snapshot.val()){
-            var walletList = "";
+            var walletList = '<option>select wallet</option>';
             snapshot.forEach((childSnapshot) => {
                 walletList += '<option>'+childSnapshot.key+'</option>'
             });
@@ -196,10 +221,10 @@ var parseUserData = function(selected_wallet){
                     document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-success"
                 }
                 if (snapshot_length > 0){
-                    document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button">clear all</span>'
+                    document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button">clear all</span>'
                 }
             }else{
-                document.getElementById("clear_all").innerHTML = '<span class="text-light fw-lighter" type="button"></span>'
+                document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button"></span>'
                 document.getElementById("history_display").innerHTML = 'No user history'
             }
         });
