@@ -94,7 +94,7 @@ $(document).ready(function() {
                     type: "income"
                 });
             } catch (error) {
-                console.log("error:",e);
+                console.log("error:",error);
             }
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
@@ -112,7 +112,7 @@ $(document).ready(function() {
                     type: "expense"
                 });
             } catch (error) {
-                console.log("error:",e);
+                console.log("error:",error);
             }
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
