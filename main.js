@@ -85,6 +85,7 @@ $(document).ready(function() {
     })
     document.querySelector("#income_button").addEventListener('click', () => {
         const d = new Date();
+        const selected_wallet = $("#wallet_collections :selected").text();
         if(validate_input()){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
@@ -103,6 +104,7 @@ $(document).ready(function() {
     })
     document.querySelector("#expense_button").addEventListener('click', () => {
         const d = new Date();
+        const selected_wallet = $("#wallet_collections :selected").text();
         if(validate_input()){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
