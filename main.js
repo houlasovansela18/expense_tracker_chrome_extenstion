@@ -55,16 +55,6 @@ function turnOnLight(){
     });
 }
 
-document.querySelector("#flexSwitchCheckChecked").addEventListener('click', () => {
-    if(document.getElementById("flexSwitchCheckChecked").checked){
-        turnOffLight()
-        localStorage.setItem("theme","dark")
-    }else{
-        turnOnLight()
-        localStorage.setItem("theme","light")
-    }
-})
-
 $(document).ready(function() {
 
     if(localStorage.getItem('theme') === "light"){
@@ -131,6 +121,16 @@ $(document).ready(function() {
         const selected_wallet = $("#wallet_collections :selected").text();
         parseUserData(selected_wallet)
     })
+    $('input:checkbox').change(
+        function(){
+            if (localStorage.getItem('theme') == "dark"){
+                turnOnLight()
+                localStorage.setItem("theme","light")
+            }else{
+                turnOffLight()
+                localStorage.setItem("theme","dark")
+            }
+        });
 });
 
 function validate_input(){
