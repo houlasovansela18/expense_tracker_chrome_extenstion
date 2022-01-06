@@ -85,8 +85,7 @@ $(document).ready(function() {
     })
     document.querySelector("#income_button").addEventListener('click', () => {
         const d = new Date();
-        const selected_wallet = $("#wallet_collections :selected").text();
-        if(validate_input() && selected_wallet != ''){
+        if(validate_input()){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
@@ -104,8 +103,7 @@ $(document).ready(function() {
     })
     document.querySelector("#expense_button").addEventListener('click', () => {
         const d = new Date();
-        const selected_wallet = $("#wallet_collections :selected").text();
-        if(validate_input() && selected_wallet != ''){
+        if(validate_input()){
             try {
                 firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
                     amount: document.getElementById('amount').value,
@@ -134,16 +132,21 @@ $(document).ready(function() {
 });
 
 function validate_input(){
-    if (document.getElementById("description").value.length >= 4){
-        if(document.getElementById("amount").value != ''){
-            return true
+    const selected_wallet = $("#wallet_collections :selected").text();
+    if(selected_wallet != ''){
+        if (document.getElementById("description").value.length >= 4){
+            if(document.getElementById("amount").value != ''){
+                return true
+            }else{
+                $("#amount_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
+                return false
+            }
         }else{
-            $("#amount_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
+            $("#description_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
             return false
         }
     }else{
-        $("#description_div").effect("shake",{ direction: "left", times: 2, distance: 2}, 200);
-        return false
+        alert("Create or select wallet before add transaction")
     }
     
 }
