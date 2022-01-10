@@ -89,7 +89,6 @@ function turnOffLight(){
     });
 }
 
-console.log(localStorage.getItem('theme'));
 if(localStorage.getItem('theme') === "light" || localStorage.getItem('theme') == ''){
     turnOnLight()
 }else{
