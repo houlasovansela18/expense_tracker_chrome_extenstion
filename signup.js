@@ -63,3 +63,35 @@ const uiConfig = {
 };
 
 ui.start('#sign_in_options', uiConfig);
+
+
+function turnOnLight(){
+    document.body.style.backgroundColor = "#fff"
+    const highlightedItems = document.querySelectorAll(".text_class");
+    highlightedItems.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("text-light","text-dark")
+    });
+    const highlightedItems_bg = document.querySelectorAll(".bg-dark");
+    highlightedItems_bg.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("bg-dark","bg-light")
+    });
+}
+
+function turnOffLight(){
+    document.body.style.backgroundColor = "rgb(20, 20, 20)"
+    const highlightedItems = document.querySelectorAll(".text_class");
+    highlightedItems.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("text-dark","text-light")
+    });
+    const highlightedItems_bg = document.querySelectorAll(".bg-light");
+    highlightedItems_bg.forEach(function(userItem) {
+        userItem.className = userItem.className.replace("bg-light","bg-dark")
+    });
+}
+
+
+if(localStorage.getItem('theme') === "light"){
+    turnOnLight()
+}else{
+    turnOffLight()
+}

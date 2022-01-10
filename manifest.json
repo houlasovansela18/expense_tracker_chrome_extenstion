@@ -2,10 +2,7 @@
     "name": "Expense Tracker",
     "version": "1.0.0",
     "description": "Help people track their asset.",
-    "permissions": [
-        "storage",
-        "identity"
-    ],
+    "permissions": [],
     "background": {
         "page": "./background.html",
         "persistent": false

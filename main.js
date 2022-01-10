@@ -31,7 +31,7 @@ window.onclick = function(event) {
     }
 }
 
-function turnOffLight(){
+function turnOnLight(){
     document.body.style.backgroundColor = "#fff"
     const highlightedItems = document.querySelectorAll(".text_class");
     highlightedItems.forEach(function(userItem) {
@@ -43,7 +43,7 @@ function turnOffLight(){
     });
 }
 
-function turnOnLight(){
+function turnOffLight(){
     document.body.style.backgroundColor = "rgb(20, 20, 20)"
     const highlightedItems = document.querySelectorAll(".text_class");
     highlightedItems.forEach(function(userItem) {
