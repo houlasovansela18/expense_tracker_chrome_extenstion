@@ -18,7 +18,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
 
     } else if (request.message === 'sign_in') {
         localStorage.setItem('user_signed_in', true);
-        localStorage.setItem("theme","light")
         response({ status: 'success' });
     }
     return true;
