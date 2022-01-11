@@ -10,11 +10,13 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 var user_info = {}
+var overall = 'overall'
+var wallet_list = []
 
 chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
     user_info = response.data
     if (user_info.email != ""){
-        parseUserInfo(user_info)
+        parseWalletInfo(user_info);
     }else{
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
             window.location.replace('./popup.html');
@@ -25,10 +27,14 @@ chrome.runtime.sendMessage({command: "getUserData"}, (response) => {
 window.onclick = function(event) {
     var target = event.target ;
     const selected_wallet = $("#wallet_collections :selected").text();
-    if(target.matches('.remove_history')) {
-        firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/${target.id}`).remove()
-        parseUserData(selected_wallet)
-    }
+        if(target.matches('.remove_history')) {
+            if (selected_wallet != overall){
+                firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/${target.id}`).remove()
+                parseWalletData(selected_wallet)
+            }else{
+                alert('Can not delete wallet history from here!')
+            }
+        }
 }
 
 function turnOnLight(){
@@ -62,7 +68,6 @@ $(document).ready(function() {
     }else{
         turnOffLight()
     }
-
     document.querySelector("#logout").addEventListener('dblclick', () => {
         chrome.runtime.sendMessage({ message: 'sign_out' },() => {
             window.location.replace('./signup.html');
@@ -70,26 +75,34 @@ $(document).ready(function() {
     })
     document.querySelector("#clear_all").addEventListener('click', () => {
         const selected_wallet = $("#wallet_collections :selected").text();
-        firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).remove()
-        parseUserData(selected_wallet)
+        if (selected_wallet != overall){
+            firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).remove()
+            parseOverallWalletData();
+        }else{
+            alert('Can not delete every wallet history! from here!')
+        }
     })
     document.querySelector("#income_button").addEventListener('click', () => {
         const d = new Date();
         const selected_wallet = $("#wallet_collections :selected").text();
         if(validate_input()){
             try {
-                firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
-                    amount: document.getElementById('amount').value,
-                    date: d.toDateString(),
-                    description: document.getElementById('description').value,
-                    type: "income"
-                });
+                if (selected_wallet != overall){
+                    firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
+                        amount: document.getElementById('amount').value,
+                        date: d.toDateString(),
+                        description: document.getElementById('description').value,
+                        type: "income"
+                    });
+                    document.getElementById('amount').value = '';
+                    document.getElementById('description').value = '';
+                    parseWalletData(selected_wallet)
+                }else{
+                    alert('You can not add transaction from overall, It is not a wallet');
+                }
             } catch (error) {
                 console.log("error:",error);
             }
-            document.getElementById('amount').value = '';
-            document.getElementById('description').value = '';
-            parseUserData(selected_wallet)
         }
     })
     document.querySelector("#expense_button").addEventListener('click', () => {
@@ -97,18 +110,22 @@ $(document).ready(function() {
         const selected_wallet = $("#wallet_collections :selected").text();
         if(validate_input()){
             try {
-                firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
-                    amount: document.getElementById('amount').value,
-                    date: d.toDateString(),
-                    description: document.getElementById('description').value,
-                    type: "expense"
-                });
+                if (selected_wallet != overall){
+                    firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).push().set({
+                        amount: document.getElementById('amount').value,
+                        date: d.toDateString(),
+                        description: document.getElementById('description').value,
+                        type: "expense"
+                    });
+                    document.getElementById('amount').value = '';
+                document.getElementById('description').value = '';
+                parseWalletData(selected_wallet)
+                }else{
+                    alert('You can not add transaction from overall, It is not a wallet');
+                }
             } catch (error) {
                 console.log("error:",error);
             }
-            document.getElementById('amount').value = '';
-            document.getElementById('description').value = '';
-            parseUserData(selected_wallet)
         }
     })
     document.querySelector("#wallet_button").addEventListener('click', () => {
@@ -119,7 +136,11 @@ $(document).ready(function() {
     })
     $("select").change(function(){
         const selected_wallet = $("#wallet_collections :selected").text();
-        parseUserData(selected_wallet)
+        if (selected_wallet === overall){
+            parseOverallWalletData()
+        }else{
+            parseWalletData(selected_wallet)
+        }
     })
     $('input:checkbox').change(
         function(){
@@ -162,24 +183,25 @@ function validate_input_wallet(){
     }
 }
 
-var parseUserInfo = function(user_info){
+var parseWalletInfo = function(user_info){
 
     document.getElementById("user_picture").src = user_info.picture;
     document.getElementById("balance_label").innerHTML = user_info.given_name+"'s BALANCE"
     firebase.database().ref(`/user_info/${user_info.id}/`).once('value', (snapshot) =>{
         if (snapshot.val()){
-            var walletList = '<option>select wallet</option>';
+            var walletList = '<option>'+overall+'</option>';
             snapshot.forEach((childSnapshot) => {
+                wallet_list.push(childSnapshot.key)
                 walletList += '<option>'+childSnapshot.key+'</option>'
             });
         }else{
             document.getElementById("history_display").innerHTML = 'No user wallet'
         }
         document.getElementById("wallet_collections").innerHTML = walletList
-    }); 
+    });
 }
 
-var parseUserData = function(selected_wallet){
+var parseWalletData = function(selected_wallet){
     try{
         firebase.database().ref(`/user_info/${user_info.id}/${selected_wallet}/`).orderByChild('date').once('value', (snapshot) =>{
             if (snapshot.val()){
@@ -228,6 +250,7 @@ var parseUserData = function(selected_wallet){
                 if (snapshot_length > 0){
                     document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button">clear all</span>'
                 }
+                return historyList,total_income,total_expense
             }else{
                 document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button"></span>'
                 document.getElementById("history_display").innerHTML = 'No user history'
@@ -236,4 +259,72 @@ var parseUserData = function(selected_wallet){
     }catch(e){
         console.log("Something error while trying accessing firebase",e);
     }
+}
+
+var parseOverallWalletData = function(){
+    let historyList_overall = ""
+    let total_income_overall = 0
+    let total_expense_overall = 0
+    let snapshot_length_overall = 0
+    wallet_list.forEach( wallet => {
+        snapshot_length_overall += 1
+        try{
+            firebase.database().ref(`/user_info/${user_info.id}/${wallet}/`).orderByChild('date').once('value', (snapshot) =>{
+                var historyList = ""
+                var total_income = 0
+                var total_expense = 0
+                if (snapshot.val()){
+                    snapshot.forEach((childSnapshot) => {
+                        var history = childSnapshot.val();
+                        var text_color = "text-success"
+                        var li_class = "border-start rounded-start border-success border-3"
+                        var amount = parseFloat(history.amount)
+                        if(history.type === "expense"){
+                            li_class = "border-start rounded-start border-danger border-3"
+                            text_color = "text-danger"
+                            total_expense += amount
+                            amount = (-1) * amount
+                        }else{
+                            total_income += amount
+                        }
+                        historyList+='<li class="'+li_class+' ps-3 mb-1" id="'+childSnapshot.key+'">'+
+                        '<div class="clearfix">'+
+                        '<div class="float-start fs-5 '+text_color+'">'+history.description+'</div>'+
+                        '<div class="float-end fs-5 '+text_color+'">'+
+                        amount+
+                        ' $<span class="ms-3 fs-6 text-danger remove_history" type="button" id="'+childSnapshot.key+'">x</span>'+
+                        '</div>'+
+                        '</div>'+
+                        '<div class="text-secondary">'+
+                        history.date+
+                        '</div>'+
+                        '</li>'
+                    });
+                    historyList_overall+=historyList
+                    total_income_overall+=total_income
+                    total_expense_overall+=total_expense
+                    console.log(historyList_overall);
+                    document.getElementById("history_display").innerHTML = historyList_overall;
+                    document.getElementById("income").innerHTML = total_income_overall;
+                    document.getElementById("expense").innerHTML = total_expense_overall;
+                    var balance_differ = total_income_overall - total_expense_overall;
+                    balance = Math.abs(balance_differ)
+                    document.getElementById("balance").innerHTML = balance;
+                    if(balance_differ < 0){
+                        document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-danger"
+                    }else{
+                        document.getElementById("balance_div").className = "pb-1 text-center display-2 fw-bold text-success"
+                    }
+                    if (snapshot_length_overall <= 0){
+                        document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button"></span>'
+                        document.getElementById("history_display").innerHTML = 'No user history'
+                    }else{
+                        document.getElementById("clear_all").innerHTML = '<span class="text-secondary" type="button">clear all</span>'
+                    }
+                }
+            });
+        }catch(e){
+            console.log("Something error while trying accessing firebase",e);
+        }  
+    })
 }
